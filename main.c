@@ -10,20 +10,35 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <curses.h>
-#include <term.h>
-#include <termios.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include "libft/libft.h"
+#include "ft_select.h"
+
+t_node		*ft_stock(char **av)
+{
+	 t_node	*list;
+	 t_node	*node;
+	 int		i;
+
+	 if (!(list = ft_memalloc(sizeof(t_node))))
+		  return (0);
+	 i = 0;
+	 node = list;
+	 while (av[i])
+	 {
+		  list->content = ft_strdup(av[i]);
+		  list->index = i;
+		  if (av[i + 1])
+			   list->next = ft_memalloc(sizeof(t_node));
+		  else
+			   list->next = NULL;
+		  list = list->next;
+		  i++;
+	 }
+	 return (node);
+}
 
 typedef struct s_data
 {
-	int fd;
+	 int fd;
 }			t_data;
 
 t_data g_data;
@@ -32,6 +47,21 @@ int     output(int str)
 {
   write (g_data.fd, &str, 1);
   return (0);
+}
+
+void    fgerig(t_node *head, int i)
+{
+	while (head)
+	{
+		if (head->index == i)
+		{
+			tputs(tgetstr("mr", 0), 0, output);
+			ft_putstr_fd(head->content,g_data.fd);
+			tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
+			tputs(tgetstr("ed", 0), 0, output);
+		}
+		head = head->next;
+	}
 }
 
 
@@ -46,36 +76,44 @@ int main(int ac , char **av)
 	config.c_lflag &= ~(ECHO | ICANON);
 	if(tcsetattr(0, 0, &config) < 0)
 		puts("error");
-	int	r = 0;
+	int r = 0;
 	tgetent(buf, getenv("TERM"));
 	tputs(tgetstr("cl", 0), 0, output);
-	int i = 1;	
-	int k = 0;
+	int i = 0;
+	int k = 1;
 	int j = 0;
+	int l = 0;
+	t_node *node = ft_stock(av);
+	t_node *head = node;
 	while (1)
 	{
-		if (k == 0)
+		if (k == 1)
 		{
-			while (av[i])
+			while (head)
 			{
-				ft_putstr(av[i]);
 				tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
+				ft_putstr_fd(head->content,g_data.fd);
+				head->check = 0;
+				head = head->next;
 				i++;
 			}
-			k = 1;
+			k = -1;
 			j = i;
 		}
+		r = 0;
 		if (read(0, &r, sizeof(int)) > 0)
 		{
 			if (r == 4283163 && i > 0)
 			{
-				tputs(tgoto(tgetstr("cm", 0), 0, --i), 0, output);
-				tputs(tgetstr("us", 0), 0, output);
+				tputs(tgoto(tgetstr("cm", 0), l, --i), 0, output);
 			}
-			else if(r == 4348699 && i < j - 2)
+			else if (r == 4348699 && i < j - 1)
 			{
-				tputs(tgoto(tgetstr("cm", 0), 0, ++i), 0, output);
-				tputs(tgetstr("us", 0), 0, output);
+				tputs(tgoto(tgetstr("cm", 0), l, ++i), 0, output);
+			}
+			else if (r == 32)
+			{
+				fgerig(node, i);
 			}
 		}
 	}

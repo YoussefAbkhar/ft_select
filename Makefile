@@ -12,7 +12,7 @@
 
 NAME = ft_select
 
-CFLAGS = -Wall -Werror -Wextra
+//CFLAGS = -Wall -Werror -Wextra
 
 SRCS = main.c
 

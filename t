@@ -1,0 +1,1 @@
+head->check = (head->check == 0) ? 1 : 0;
