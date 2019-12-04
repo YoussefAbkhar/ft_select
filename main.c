@@ -49,7 +49,7 @@ int     output(int str)
   return (0);
 }
 
-void    fgerig(t_node *node, int i)
+void    ft_select(t_node *node, int i)
 {
 	while (node)
 	{
@@ -71,7 +71,15 @@ void    fgerig(t_node *node, int i)
 	}
 }
 
+void	ft_select_up(int i)
+{
+	tputs(tgoto(tgetstr("cm", 0), 0,i), 0, output);
+}
 
+void	ft_select_down(int i)
+{
+	tputs(tgoto(tgetstr("cm", 0), 0,i), 0, output);
+}
 int main(int ac , char **av)
 {
 	g_data.fd = open("/dev/tty", O_RDWR);
@@ -88,7 +96,6 @@ int main(int ac , char **av)
 	tputs(tgetstr("cl", 0), 0, output);
 	int i = 0;
 	int k = 1;
-	int j = 0;
 	int l = 0;
 	t_node *node, *head;
 	head = ft_stock(av);
@@ -106,21 +113,35 @@ int main(int ac , char **av)
 				i++;
 			}
 			k = -1;
-			j = i;
+			l = i;
+			i = 0;
+			tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
 		}
 		r = 0;
 		if (read(0, &r, sizeof(int)) > 0)
 		{
-			if (r == 4283163 && i > 0)
+			if (r == 4283163)
 			{
-				tputs(tgoto(tgetstr("cm", 0), l, --i), 0, output);
+				if (i > 0)
+					tputs(tgoto(tgetstr("cm", 0), 0, --i), 0, output);
+				else if (i == 0)
+				{
+					i = l - 1;
+					tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
+				}
 			}
-			else if (r == 4348699 && i < j - 1)
+			else if (r == 4348699)
 			{
-				tputs(tgoto(tgetstr("cm", 0), l, ++i), 0, output);
+				if (i < l - 1)
+					tputs(tgoto(tgetstr("cm", 0), 0, ++i), 0, output);
+				else if (i == l - 1)
+				{
+					i = 0;
+					tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
+				}
 			}
-			else if (r == 32)
-				fgerig(node, i);
+			if (r == 32)
+				ft_select(node, i);
 		}
 	}
 }
