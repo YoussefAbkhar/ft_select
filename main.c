@@ -49,18 +49,25 @@ int     output(int str)
   return (0);
 }
 
-void    fgerig(t_node *head, int i)
+void    fgerig(t_node *node, int i)
 {
-	while (head)
+	while (node)
 	{
-		if (head->index == i)
+		if (node->index == i && node->check == 0)
 		{
 			tputs(tgetstr("mr", 0), 0, output);
-			ft_putstr_fd(head->content,g_data.fd);
+			ft_putstr_fd(node->content,g_data.fd);
+			node->check = 1;
 			tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
-			tputs(tgetstr("ed", 0), 0, output);
+			tputs(tgetstr("me", 0), 0, output);
 		}
-		head = head->next;
+		else if (node->index == i && node->check == 1)
+		{
+			node->check = 0;
+			ft_putstr_fd(node->content,g_data.fd);
+			tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
+		}
+		node = node->next;
 	}
 }
 
@@ -83,13 +90,14 @@ int main(int ac , char **av)
 	int k = 1;
 	int j = 0;
 	int l = 0;
-	t_node *node = ft_stock(av);
-	t_node *head = node;
+	t_node *node, *head;
+	head = ft_stock(av);
+	node = head;
 	while (1)
 	{
 		if (k == 1)
 		{
-			while (head)
+			while(head)
 			{
 				tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
 				ft_putstr_fd(head->content,g_data.fd);
@@ -112,9 +120,7 @@ int main(int ac , char **av)
 				tputs(tgoto(tgetstr("cm", 0), l, ++i), 0, output);
 			}
 			else if (r == 32)
-			{
 				fgerig(node, i);
-			}
 		}
 	}
 }
