@@ -71,15 +71,6 @@ void    ft_select(t_node *node, int i)
 	}
 }
 
-void	ft_select_up(int i)
-{
-	tputs(tgoto(tgetstr("cm", 0), 0,i), 0, output);
-}
-
-void	ft_select_down(int i)
-{
-	tputs(tgoto(tgetstr("cm", 0), 0,i), 0, output);
-}
 int main(int ac , char **av)
 {
 	g_data.fd = open("/dev/tty", O_RDWR);
@@ -123,7 +114,10 @@ int main(int ac , char **av)
 			if (r == 4283163)
 			{
 				if (i > 0)
-					tputs(tgoto(tgetstr("cm", 0), 0, --i), 0, output);
+				{
+					--i;
+					tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
+				}
 				else if (i == 0)
 				{
 					i = l - 1;
@@ -133,7 +127,10 @@ int main(int ac , char **av)
 			else if (r == 4348699)
 			{
 				if (i < l - 1)
-					tputs(tgoto(tgetstr("cm", 0), 0, ++i), 0, output);
+				{
+					++i;
+					tputs(tgoto(tgetstr("cm", 0), 0, i), 0, output);
+				}
 				else if (i == l - 1)
 				{
 					i = 0;
